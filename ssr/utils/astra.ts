@@ -11,12 +11,12 @@ type AstraRequestProps = {
 
 export async function AstraRequest({ path, method = 'GET', query, body }: AstraRequestProps) {
     const res = await axios.request({
-        url: `${process.env.ASTRA_HOST}${path.startsWith('/') ? path : `/${path}`}`,
+        url: `${process.env.ASTRA_HOST || '127.0.0.1'}${path.startsWith('/') ? path : `/${path}`}`,
         params: query,
         data: body,
         method,
         auth: {
-            username: process.env.ASTRA_USER as string,
+            username: process.env.ASTRA_USER || 'ek-media',
             password: process.env.ASTRA_PASS as string
         }
     });
