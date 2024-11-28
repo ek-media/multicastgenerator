@@ -11,7 +11,7 @@ type AstraRequestProps = {
 
 export async function AstraRequest({ path, method = 'GET', query, body }: AstraRequestProps) {
     const res = await axios.request({
-        url: `${process.env.ASTRA_HOST || '127.0.0.1'}${path.startsWith('/') ? path : `/${path}`}`,
+        url: `${process.env.ASTRA_HOST || 'http://127.0.0.1:9091'}${path.startsWith('/') ? path : `/${path}`}`,
         params: query,
         data: body,
         method,
