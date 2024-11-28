@@ -18,7 +18,7 @@ export default function HomePage() {
 
 	useEffect(() => {
 		fetchConfig();
-		const ival = setInterval(() => fetchConfig(), 5000);
+		const ival = setInterval(() => fetchConfig(), 2500);
 		return () => {
 			clearInterval(ival);
 		}
