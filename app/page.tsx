@@ -60,7 +60,7 @@ export default function HomePage() {
 		if(isUpdating)
 			setTimeout(() => {
 				window.location.reload();
-			}, 10000);
+			}, 30000);
 	}, [isUpdating])
 
 	return (
