@@ -15,7 +15,7 @@ export async function CheckUpdates(): Promise<CheckUpdatesResponse> {
         }, (err, res) => {
             if(err)
                 return reject(err);
-            return resolve(res);
+            return resolve(res.trim());
         })
     });
 
@@ -51,8 +51,7 @@ export async function PerformUpdate() {
         'git pull',
         'yarn',
         'yarn build',
-        'yarn prod:restart',
-        'pm2 save'
+        'yarn prod:restart'
     ];
 
     for(const command of commands)
