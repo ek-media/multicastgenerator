@@ -1,6 +1,7 @@
 "use client"
 
 import { AstraStream, GetAstraStreams, ToggleAstraStream } from "@/ssr/astra";
+import { CheckUpdates, CheckUpdatesResponse, PerformUpdate } from "@/ssr/update";
 import { cn } from "@/utils/cn";
 import { format } from "date-fns";
 import { useCallback, useEffect, useMemo, useState } from "react"
@@ -10,17 +11,33 @@ export default function HomePage() {
 	const [view, setView] = useState<'list' | 'grid'>('list');
 	const [streams, setStreams] = useState<AstraStream[] | null>(null);
 	const [lastFetched, setLastFetched] = useState<number>(0);
+	const [checkUpdateResponse, setCheckUpdateResponse] = useState<CheckUpdatesResponse | null>(null);
+	const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
 	const fetchConfig = useCallback(async () => {
 		setStreams(await GetAstraStreams());
 		setLastFetched(Date.now());
 	}, []);
 
+	const checkUpdate = useCallback(async () => {
+		setCheckUpdateResponse(await CheckUpdates());
+	}, []);
+
+	const doUpdate = useCallback(async () => {
+		setIsUpdating(true);
+		await PerformUpdate();
+		// @ts-ignore
+		window.location.reload();
+	}, []);
+
 	useEffect(() => {
 		fetchConfig();
-		const ival = setInterval(() => fetchConfig(), 2500);
+		checkUpdate();
+		const ivalConfig = setInterval(() => fetchConfig(), 2500);
+		const ivalUpdates = setInterval(() => checkUpdate(), 10000);
 		return () => {
-			clearInterval(ival);
+			clearInterval(ivalConfig);
+			clearInterval(ivalUpdates);
 		}
 	}, []);
 
@@ -43,6 +60,14 @@ export default function HomePage() {
 
 	return (
 		<>
+			{isUpdating && (
+				<div className={`fixed top-0 left-0 bottom-0 right-0 bg-black bg-opacity-50 flex items-center justify-center`}>
+					<div className={`bg-white p-8 rounded-lg`}>
+						<p className={`font-bold text-xl`}>Updating software</p>
+						<p className={`mt-2`}>This window will refresh automatically.</p>
+					</div>
+				</div>
+			)}
 			{streams === null && (
 				<div>
 					<p>Loading...</p>
@@ -50,6 +75,9 @@ export default function HomePage() {
 			)}
 			<div className={`flex mt-8 ml-8 mr-8 items-center`}>
 				<button className={`bg-gray-500 text-white text-sm rounded px-2 py-1`} onClick={() => setView(view === 'grid' ? 'list' : 'grid')}>View as {view === 'list' ? 'grid' : 'list'}</button>
+				{checkUpdateResponse?.update_available && (
+					<button className={`bg-blue-500 text-white text-sm rounded px-2 py-1 ml-4`} onClick={doUpdate}>New update available</button>
+				)}
 				<div className={`ml-auto flex items-center space-x-8 text-sm`}>
 					{amountWarnings !== 0 && (
 						<p className={`text-orange-700 font-medium`}>{amountWarnings} bitrate warning{amountWarnings === 1 ? '' : 's'}</p>
@@ -245,6 +273,12 @@ export default function HomePage() {
 					</table>
 				</div>
 			)}
+			<div className={`flex items-center px-8 pb-8 text-xs italic space-x-4`}>
+				<p>Version: {checkUpdateResponse?.current_hash || 'loading'}</p>
+				{checkUpdateResponse?.update_available && (
+					<p>New update available, version {checkUpdateResponse?.newest_hash || 'loading'}</p>
+				)}
+			</div>
 		</>
 	)
 }
