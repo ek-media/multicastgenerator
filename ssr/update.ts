@@ -1,6 +1,6 @@
 "use server"
 
-import { exec, spawn } from "child_process"
+import { exec } from "child_process"
 import { join } from "path";
 
 export type CheckUpdatesResponse = {
