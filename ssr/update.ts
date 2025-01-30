@@ -46,19 +46,3 @@ export async function CheckUpdates(): Promise<CheckUpdatesResponse> {
         update_available: current_hash !== newest_hash
     }
 }
-
-export async function PerformUpdate() {
-    const commands = [
-        `chmod +x ${join(process.cwd(), 'update.sh')}`,
-        `${join(process.cwd(), 'update.sh')}`
-    ];
-    
-    console.log(`[Update] starting cwd: ${process.cwd()}`);
-
-    for(const command of commands)
-        await new Promise((resolve, reject) => {
-            exec(command, (err, res) => err ? reject(err) : resolve(res))
-        })
-
-    console.log(`[Update] finished`);
-}
