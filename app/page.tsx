@@ -34,7 +34,7 @@ export default function HomePage() {
 	}, [streams]);
 
 	const amountErrors = useMemo(() => (streams || [])
-		.filter(item => item.stats && (item.stats.cc_error !== 0 || item.stats.audio_count === 0 || item.stats.video_count === 0)).length, [streams])
+		.filter(item => item.stats && (item.stats.cc_error !== 0 || item.stats.pes_error !== 0 || item.stats.sc_error !== 0 || item.stats.sync_error !== 0 || item.stats.audio_count === 0 || item.stats.video_count === 0)).length, [streams])
 
 	const amountWarnings = useMemo(() => (streams || [])
 		.filter(item => item.stats && item.stats.bitrate > 200 && item.stats.bitrate < 600).length, [streams]);
@@ -85,14 +85,19 @@ export default function HomePage() {
 							{stream.stats && (
 								<div className={`flex flex-col mt-4`}>
 									<div className={`text-xs grid grid-cols-4 text-center`}>
+										<p className={cn('py-2 rounded', stream.stats.pes_error !== 0 && 'bg-red-500')}>PES: {stream.stats.pes_error}</p>
 										<p className={cn('py-2 rounded', stream.stats.cc_error !== 0 && 'bg-red-500')}>CC: {stream.stats.cc_error}</p>
-										<p className={`py-2`}>Audio: {stream.stats.audio_count}</p>
-										<p className={`py-2`}>Video: {stream.stats.video_count}</p>
-										<p className={`py-2`}>Sessions: {stream.stats.sessions}</p>
+										<p className={cn('py-2 rounded', stream.stats.sc_error !== 0 && 'bg-red-500')}>SC: {stream.stats.sc_error}</p>
+										<p className={cn('py-2 rounded', stream.stats.sync_error !== 0 && 'bg-red-500')}>SYNC: {stream.stats.sync_error}</p>
+									</div>
+									<div className={`text-xs grid grid-cols-3 text-center mt-4`}>
+										<p>Audio: {stream.stats.audio_count}</p>
+										<p>Video: {stream.stats.video_count}</p>
+										<p>Sessions: {stream.stats.sessions}</p>
 									</div>
 									<div className={`flex items-center space-x-4 justify-center mt-6`}>
 										{stream.output && (
-											<p className={`text-xs`}>Output: <span className={`bg-gray-200 py-1 px-2 rounded font-medium`}>{stream.output}</span></p>
+											<p className={`text-xs`}>Multicast: <span className={`bg-gray-200 py-1 px-2 rounded font-medium`}>{stream.output}</span></p>
 										)}
 										<p className={`text-xs`}>PNR: <span className={`bg-gray-200 py-1 px-2 rounded font-medium`}>{stream.id}</span></p>
 									</div>
@@ -113,15 +118,19 @@ export default function HomePage() {
 				<div className={`p-8`}>
 					<table className={`w-full`}>
 						<thead>
-							<tr className={`font-medium bg-gray-300`}>
-								<td className={`py-4 pl-4`}>Name</td>
-								<td className={`w-32`}>Status</td>
-								<td className={`w-20`}>CC</td>
-								<td className={`w-20`}>Audio</td>
-								<td className={`w-20`}>Video</td>
-								<td className={`w-20`}>Sessions</td>
-								<td className={`w-20`}>PNR</td>
-								<td className={`text-right pr-4 w-36`}>Bitrate</td>
+							<tr className={`font-medium`}>
+								<td className={`py-2 pl-4`}>Name</td>
+								<td>Status</td>
+								<td>PES</td>
+								<td>CC</td>
+								<td>SC</td>
+								<td>SYNC</td>
+								<td>Audio</td>
+								<td>Video</td>
+								<td>Sessions</td>
+								<td>PNR</td>
+								<td>Multicast</td>
+								<td>Bitrate</td>
 							</tr>
 						</thead>
 						<tbody>
@@ -129,12 +138,7 @@ export default function HomePage() {
 								<tr key={key} className={cn(
 									key % 2 === 1 && 'bg-gray-200'
 								)}>
-									<td className={`py-3 pl-4 font-medium flex flex-col space-y-1.5`}>
-										<p className={`leading-none`}>{stream.name}</p>
-										{stream.output && (
-											<p className={`text-sm font-normal leading-none`}>&rarr; {stream.output}</p>
-										)}
-									</td>
+									<td className={`py-2 pl-4 font-medium`}>{stream.name}</td>
 									<td>
 										<button
 											className={cn(
@@ -152,9 +156,39 @@ export default function HomePage() {
 												<div className={`flex`}>
 													<div className={cn(
 														`py-1 px-2 rounded text-sm`,
+														stream.stats.pes_error !== 0 && 'bg-red-500'
+													)}>
+														{stream.stats.pes_error}
+													</div>
+												</div>
+											</td>
+											<td>
+												<div className={`flex`}>
+													<div className={cn(
+														`py-1 px-2 rounded text-sm`,
 														stream.stats.cc_error !== 0 && 'bg-red-500'
 													)}>
 														{stream.stats.cc_error}
+													</div>
+												</div>
+											</td>
+											<td>
+												<div className={`flex`}>
+													<div className={cn(
+														`py-1 px-2 rounded text-sm`,
+														stream.stats.sc_error !== 0 && 'bg-red-500'
+													)}>
+														{stream.stats.sc_error}
+													</div>
+												</div>
+											</td>
+											<td>
+												<div className={`flex`}>
+													<div className={cn(
+														`py-1 px-2 rounded text-sm`,
+														stream.stats.sync_error !== 0 && 'bg-red-500'
+													)}>
+														{stream.stats.sync_error}
 													</div>
 												</div>
 											</td>
@@ -186,13 +220,17 @@ export default function HomePage() {
 											<td></td>
 											<td></td>
 											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
 										</>
 									)}
 									<td>{stream.id}</td>
-									<td className={`flex py-3 pr-4`}>
+									<td>{stream.output}</td>
+									<td className={`flex py-2`}>
 										{stream.stats && (
 											<div className={cn(
-												`rounded py-1 px-2 text-sm ml-auto`,
+												`rounded py-1 px-2 text-sm`,
 												stream.stats.bitrate < 200 ? 'bg-red-500' : (
 													stream.stats.bitrate < 600 ? 'bg-yellow-500' : 'bg-green-500'
 												)
