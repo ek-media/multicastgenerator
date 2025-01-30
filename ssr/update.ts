@@ -54,14 +54,20 @@ export async function PerformUpdate() {
         'yarn prod:restart'
     ];
 
+    console.log(`[Update] starting cwd: ${process.cwd()}`);
+
     for(const command of commands)
         await new Promise((resolve, reject) => {
+            console.log(`[Update] exec: ${command}`)
             exec(command, {
                 cwd: process.cwd()
             }, (err, res) => {
                 if(err)
                     return reject(err);
+                console.log(res);
                 return resolve(undefined);
             })
         });
+
+    console.log(`[Update] finished`);
 }
