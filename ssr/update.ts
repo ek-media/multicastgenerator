@@ -1,6 +1,6 @@
 "use server"
 
-import { exec } from "child_process"
+import { exec, spawn } from "child_process"
 
 export type CheckUpdatesResponse = {
     current_hash: string,
@@ -54,18 +54,16 @@ export async function PerformUpdate() {
     
     console.log(`[Update] starting cwd: ${process.cwd()}`);
 
-    for(const command of commands)
-        await new Promise((resolve, reject) => {
-            console.log(`[Update] exec: ${command}`)
-            exec(command, {
-                cwd: process.cwd()
-            }, (err, res) => {
-                if(err)
-                    return reject(err);
-                console.log(res);
-                return resolve(undefined);
-            })
+    await new Promise((resolve, reject) => {
+        const proc = spawn('git pull && yarn && yarn build && yarn prod:restart', {
+            cwd: process.cwd()
         });
+        proc.stdout.pipe(process.stdout);
+        proc.stderr.pipe(process.stderr);
+        proc.on('close', () => {
+            return resolve(undefined);
+        })
+    })
 
     console.log(`[Update] finished`);
 }
