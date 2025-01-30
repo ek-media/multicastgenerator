@@ -51,6 +51,7 @@ export async function PerformUpdate() {
         'git pull && yarn && yarn build && yarn prod:restart'
     ];
 
+    
     console.log(`[Update] starting cwd: ${process.cwd()}`);
 
     for(const command of commands)
