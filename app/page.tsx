@@ -26,7 +26,7 @@ export default function HomePage() {
 		fetchConfig();
 		checkUpdate();
 		const ivalConfig = setInterval(() => fetchConfig(), 2500);
-		const ivalUpdates = setInterval(() => checkUpdate(), 10000);
+		const ivalUpdates = setInterval(() => checkUpdate(), 5000);
 		return () => {
 			clearInterval(ivalConfig);
 			clearInterval(ivalUpdates);
