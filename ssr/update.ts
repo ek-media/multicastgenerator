@@ -3,6 +3,7 @@
 import { exec } from "child_process"
 import { join } from "path";
 
+
 export type CheckUpdatesResponse = {
     current_hash: string,
     newest_hash: string,
