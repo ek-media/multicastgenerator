@@ -51,8 +51,8 @@ export default function HomePage() {
 	const enabledAmount = useMemo(() => (streams || []).filter(item => item.enable).length, [streams]);
 
 	const isUpdating = useMemo(() => {
-		if(!checkUpdateResponse) return false;
-		if(checkUpdateResponse.current_hash !== process.env.current_hash) return true;
+		if(!checkUpdateResponse || !process.env.current_hash) return false;
+		if(checkUpdateResponse.current_hash !== process.env.current_hash.substring(0, 7)) return true;
 		return false;
 	}, [checkUpdateResponse]);
 
