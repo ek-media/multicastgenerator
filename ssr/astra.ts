@@ -24,12 +24,12 @@ export async function GetAstraStreams(): Promise<AstraStream[]> {
         path: '/api/stream-info'
     });
     const streams: Array<Omit<AstraStream, 'stats'>> = res.streams.map((stream: any) => {
-        const outputFilter = (stream.output || []).filter((item: string) => item.startsWith('udp://'));
+        const outputFilter = (stream.output || []);
         return {
             id: stream.id,
             name: stream.name,
             enable: stream.enable,
-            output: outputFilter.length !== 0 ? (outputFilter[0].includes('@') ? outputFilter[0].split('@')[1] : outputFilter[0].substring(6)) : undefined
+            output: outputFilter.length !== 0 ? outputFilter[0] : undefined
         }
     });
     const stats = await Promise.all(streams.filter(item => item.enable).map(async (stream) => {
