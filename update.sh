@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd /root/multicastgenerator
+
 BRANCH="main"
 git remote update
 LAST_UPDATE=`git show --no-notes --format=format:"%H" $BRANCH | head -n 1`
