@@ -50,7 +50,7 @@ export async function CheckUpdates(): Promise<CheckUpdatesResponse> {
 export async function PerformUpdate() {
     const commands = [
         `chmod +x ${join(process.cwd(), 'update.sh')}`,
-        `./${join(process.cwd(), 'update.sh')}`
+        `${join(process.cwd(), 'update.sh')}`
     ];
     
     console.log(`[Update] starting cwd: ${process.cwd()}`);
