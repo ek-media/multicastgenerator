@@ -48,10 +48,7 @@ export async function CheckUpdates(): Promise<CheckUpdatesResponse> {
 
 export async function PerformUpdate() {
     const commands = [
-        'git pull',
-        'yarn',
-        'yarn build',
-        'yarn prod:restart'
+        'git pull && yarn && yarn build && yarn prod:restart'
     ];
 
     console.log(`[Update] starting cwd: ${process.cwd()}`);
