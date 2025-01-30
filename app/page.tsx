@@ -50,8 +50,29 @@ export default function HomePage() {
 
 	const enabledAmount = useMemo(() => (streams || []).filter(item => item.enable).length, [streams]);
 
+	const isUpdating = useMemo(() => {
+		if(!checkUpdateResponse) return false;
+		if(checkUpdateResponse.current_hash !== process.env.current_hash) return true;
+		return false;
+	}, [checkUpdateResponse]);
+
+	useEffect(() => {
+		if(isUpdating)
+			setTimeout(() => {
+				window.location.reload();
+			}, 10000);
+	}, [isUpdating])
+
 	return (
 		<>
+			{isUpdating && (
+				<div className={`fixed top-0 left-0 bottom-0 right-0 bg-black bg-opacity-50 flex items-center justify-center`}>
+					<div className={`bg-white p-8 rounded-lg`}>
+						<p className={`font-bold text-xl`}>Updating software</p>
+						<p className={`mt-2`}>This window will refresh automatically.</p>
+					</div>
+				</div>
+			)}
 			{streams === null && (
 				<div>
 					<p>Loading...</p>
